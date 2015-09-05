@@ -2,36 +2,18 @@
 1 verbose cli [ '/usr/local/bin/iojs', '/usr/local/bin/npm', 'start' ]
 2 info using npm@2.8.3
 3 info using node@v1.8.1
-4 verbose run-script [ 'prestart', 'start', 'poststart' ]
-5 info prestart instagram-clone-server@0.0.1
-6 info start instagram-clone-server@0.0.1
-7 verbose unsafe-perm in lifecycle true
-8 info instagram-clone-server@0.0.1 Failed to exec start script
-9 verbose stack Error: instagram-clone-server@0.0.1 start: `node server.js`
-9 verbose stack Exit status 1
-9 verbose stack     at EventEmitter.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/lifecycle.js:213:16)
-9 verbose stack     at emitTwo (events.js:87:13)
-9 verbose stack     at EventEmitter.emit (events.js:169:7)
-9 verbose stack     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/spawn.js:24:14)
-9 verbose stack     at emitTwo (events.js:87:13)
-9 verbose stack     at ChildProcess.emit (events.js:169:7)
-9 verbose stack     at maybeClose (child_process.js:953:16)
-9 verbose stack     at Process.ChildProcess._handle.onexit (child_process.js:1020:5)
-10 verbose pkgid instagram-clone-server@0.0.1
-11 verbose cwd /Users/alejandro/Developer/mean_stack/nodeapps/instagram-clone/server
-12 error Darwin 14.0.0
-13 error argv "/usr/local/bin/iojs" "/usr/local/bin/npm" "start"
-14 error node v1.8.1
-15 error npm  v2.8.3
-16 error code ELIFECYCLE
-17 error instagram-clone-server@0.0.1 start: `node server.js`
-17 error Exit status 1
-18 error Failed at the instagram-clone-server@0.0.1 start script 'node server.js'.
-18 error This is most likely a problem with the instagram-clone-server package,
-18 error not with npm itself.
-18 error Tell the author that this fails on your system:
-18 error     node server.js
-18 error You can get their info via:
-18 error     npm owner ls instagram-clone-server
-18 error There is likely additional logging output above.
-19 verbose exit [ 1, true ]
+4 verbose stack Error: ENOENT: no such file or directory, open '/Users/alejandro/Developer/mean_stack/nodeapps/instagram-clone/server/package.json'
+4 verbose stack     at Error (native)
+5 verbose cwd /Users/alejandro/Developer/mean_stack/nodeapps/instagram-clone/server
+6 error Darwin 14.0.0
+7 error argv "/usr/local/bin/iojs" "/usr/local/bin/npm" "start"
+8 error node v1.8.1
+9 error npm  v2.8.3
+10 error path /Users/alejandro/Developer/mean_stack/nodeapps/instagram-clone/server/package.json
+11 error code ENOENT
+12 error errno -2
+13 error syscall open
+14 error enoent ENOENT: no such file or directory, open '/Users/alejandro/Developer/mean_stack/nodeapps/instagram-clone/server/package.json'
+14 error enoent This is most likely not a problem with npm itself
+14 error enoent and is related to npm not being able to find a file.
+15 verbose exit [ -2, true ]
