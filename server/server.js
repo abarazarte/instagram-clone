@@ -25,7 +25,24 @@ mongoose.connect(config.db);
 var app = express();
 
 app.set('port', process.env.PORT || 3000);
-app.use(cors());
+//app.use(cors());
+app.use(function(req, res, next){
+  // Website you wish to allow to connect
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8000');
+
+  // Request methods you wish to allow
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+  // Request headers you wish to allow
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization');
+
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader('Access-Control-Allow-Credentials', true);
+
+  // Pass to next layer of middleware
+  next();
+});
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -107,7 +124,7 @@ app.post('/auth/signup', function(req, res){
   });
 });
 
-app.post('/auth/instagram', function(req, res){
+app.post('/auth/instagram', function(req, res) {
   var accessTokenUrl = 'https://api.instagram.com/oauth/access_token';
 
   var params = {
@@ -118,39 +135,44 @@ app.post('/auth/instagram', function(req, res){
     grant_type: 'authorization_code'
   };
 
-  //Step 1. Exchange authorization code for access token.
-  request.post({ url: accessTokenUrl, form: params, json: true }, function(e, r, body){
-    //Step 2a. Link user accounts.
-    if(req.headers.authorization){
-      User.findOne({ instagramId: body.user.id }, function(err, existingUser){
+  // Step 1. Exchange authorization code for access token.
+  request.post({ url: accessTokenUrl, form: params, json: true }, function(error, response, body) {
+
+    // Step 2a. Link user accounts.
+    if (req.headers.authorization) {
+
+      User.findOne({ instagramId: body.user.id }, function(err, existingUser) {
+
         var token = req.headers.authorization.split(' ')[1];
         var payload = jwt.decode(token, config.tokenSecret);
 
-        User.findById(payload.sub, '+password', function(err, localUser){
-          if(!localUser){
+        User.findById(payload.sub, '+password', function(err, localUser) {
+          if (!localUser) {
             return res.status(400).send({ message: 'User not found.' });
           }
 
-          //Merge two accounts.
-          if(existingUser){
+          // Merge two accounts. Instagram account takes precedence. Email account is deleted.
+          if (existingUser) {
+
             existingUser.email = localUser.email;
             existingUser.password = localUser.password;
 
             localUser.remove();
 
-            existingUser.save(function(){
+            existingUser.save(function() {
               var token = createToken(existingUser);
               return res.send({ token: token, user: existingUser });
             });
+
           } else {
-            //Link current email account with the instagram profile information.
+            // Link current email account with the Instagram profile information.
             localUser.instagramId = body.user.id;
             localUser.username = body.user.username;
             localUser.fullName = body.user.full_name;
             localUser.picture = body.user.profile_picture;
             localUser.accessToken = body.access_token;
 
-            localUser.save(function(){
+            localUser.save(function() {
               var token = createToken(localUser);
               res.send({ token: token, user: localUser });
             });
@@ -158,10 +180,10 @@ app.post('/auth/instagram', function(req, res){
           }
         });
       });
-    }else {
-      //Step 2b. Create a new user account or return an existing one.
-      User.findOne({ instagramId: body.user.id }, function(err, existingUser){
-        if(existingUser){
+    } else {
+      // Step 2b. Create a new user account or return an existing one.
+      User.findOne({ instagramId: body.user.id }, function(err, existingUser) {
+        if (existingUser) {
           var token = createToken(existingUser);
           return res.send({ token: token, user: existingUser });
         }
@@ -174,7 +196,7 @@ app.post('/auth/instagram', function(req, res){
           accessToken: body.access_token
         });
 
-        user.save(function(){
+        user.save(function() {
           var token = createToken(user);
           res.send({ token: token, user: user });
         });
@@ -183,12 +205,13 @@ app.post('/auth/instagram', function(req, res){
   });
 });
 
+
 app.get('/api/feed', isAuthenticated, function(req, res){
   var feedUrl = 'https://api.instagram.com/v1/users/self/feed';
   var params = { access_token: req.user.accessToken };
 
-  request.get({ url: feedUrl, qs: params, json: true }, function(err, res, body){
-    if(!err && res.statusCode == 200){
+  request.get({ url: feedUrl, qs: params, json: true }, function(err, response, body){
+    if(!err && response.statusCode == 200){
       res.send(body.data);
     }
   });
@@ -198,8 +221,8 @@ app.get('/api/media/:id', isAuthenticated, function(req, res, next){
   var mediaUrl = 'https://api.instagram.com/v1/media/' + req.params.id;
   var params = { access_token: req.user.accessToken };
 
-  request.get({ url: mediaUrl, qs: params, json: true }, function(err, res, body){
-    if(!err && res.statusCode == 200){
+  request.get({ url: mediaUrl, qs: params, json: true }, function(err, response, body){
+    if(!err && response.statusCode == 200){
       res.send(body.data);
     }
   });
